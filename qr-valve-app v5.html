@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AWC Valve Service Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #B91C1C;
+            color: white;
+            padding: 20enstyle;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .valve-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .valve-detail {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .valve-detail label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .valve-detail span {
+            color: #212529;
+        }
+        
+        .service-options {
+            padding: 30px 20px;
+        }
+        
+        .service-title {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 25px;
+            color: #212529;
+        }
+        
+        .service-btn {
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .service-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .service-btn.repair {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .service-btn.asset {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+        
+        .service-btn.quote {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+        
+        .service-icon {
+            font-size: 24px;
+        }
+        
+        .form-container {
+            display: none;
+            padding: 20px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #B91C1C;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #991B1B;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .success-message {
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .data-output {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">AWC</div>
+            <div style="font-size: 14px; margin-top: 5px;">Valve Service Portal</div>
+        </div>
+        
+        <!-- Valve Information Display -->
+        <div class="valve-info" id="valveInfo">
+            <h3 style="margin-bottom: 15px; color: #B91C1C;">Valve Information</h3>
+            <div class="valve-detail">
+                <label>Serial Number:</label>
+                <span>AWC-2024-78432</span>
+            </div>
+            <div class="valve-detail">
+                <label>Model:</label>
+                <span>OPP-4500-SS</span>
+            </div>
+            <div class="valve-detail">
+                <label>Size:</label>
+                <span>4"</span>
+            </div>
+            <div class="valve-detail">
+                <label>Last Service:</label>
+                <span>03/15/2024</span>
+            </div>
+            <div class="valve-detail">
+                <label>Customer:</label>
+                <span>Acme Industries</span>
+            </div>
+            <div class="valve-detail">
+                <label>Location:</label>
+                <span>Tank Farm - Unit 3</span>
+            </div>
+        </div>
+        
+        <!-- Service Options -->
+        <div class="service-options" id="serviceOptions">
+            <h2 class="service-title">How can we help you today?</h2>
+            
+            <button class="service-btn repair" onclick="showForm('repair')">
+                <span>Service Required</span>
+                <span class="service-icon">🔧</span>
+            </button>
+            
+            <button class="service-btn asset" onclick="showForm('asset')">
+                <span>Asset Management</span>
+                <span class="service-icon">📊</span>
+            </button>
+            
+            <button class="service-btn quote" onclick="showForm('quote')">
+                <span>New Quote Request</span>
+                <span class="service-icon">📝</span>
+            </button>
+        </div>
+        
+        <!-- Service Required Form -->
+        <div class="form-container" id="repairForm">
+            <button class="back-btn" onclick="backToOptions()">← Back</button>
+            <h2 style="margin-bottom: 20px;">Service Request Form</h2>
+            
+            <div class="form-group">
+                <label>Contact Name <span class="required">*</span></label>
+                <input type="text" id="repair_contact" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" id="repair_email" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="repair_phone">
+            </div>
+            
+            <div class="form-group">
+                <label>Service Type <span class="required">*</span></label>
+                <select id="repair_type" required>
+                    <option value="">Select service type...</option>
+                    <option value="emergency">Emergency Repair</option>
+                    <option value="scheduled">Scheduled Maintenance</option>
+                    <option value="inspection">Inspection Only</option>
+                    <option value="rebuild">Complete Rebuild</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Issue Description <span class="required">*</span></label>
+                <textarea id="repair_description" placeholder="Please describe the issue or service needed..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Preferred Service Date</label>
+                <input type="date" id="repair_date">
+            </div>
+            
+            <button class="submit-btn" onclick="submitForm('repair')">Submit Service Request</button>
+        </div>
+        
+        <!-- Asset Management Form -->
+        <div class="form-container" id="assetForm">
+            <button class="back-btn" onclick="backToOptions()">← Back</button>
+            <h2 style="margin-bottom: 20px;">Asset Management Form</h2>
+            
+            <div class="form-group">
+                <label>Contact Name <span class="required">*</span></label>
+                <input type="text" id="asset_contact" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" id="asset_email" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Request Type <span class="required">*</span></label>
+                <select id="asset_type" required>
+                    <option value="">Select request type...</option>
+                    <option value="spare_parts">Spare Parts Inventory</option>
+                    <option value="pm_schedule">PM Schedule Setup</option>
+                    <option value="training">Training Request</option>
+                    <option value="documentation">Documentation Update</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Additional Valves to Include</label>
+                <textarea id="asset_valves" placeholder="Enter serial numbers of other valves to include (one per line)"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Special Requirements</label>
+                <textarea id="asset_requirements" placeholder="Any special requirements or notes..."></textarea>
+            </div>
+            
+            <button class="submit-btn" onclick="submitForm('asset')">Submit Asset Request</button>
+        </div>
+        
+        <!-- New Quote Form -->
+        <div class="form-container" id="quoteForm">
+            <button class="back-btn" onclick="backToOptions()">← Back</button>
+            <h2 style="margin-bottom: 20px;">New Quote Request</h2>
+            
+            <div class="form-group">
+                <label>Contact Name <span class="required">*</span></label>
+                <input type="text" id="quote_contact" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" id="quote_email" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Company <span class="required">*</span></label>
+                <input type="text" id="quote_company" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Quote Type <span class="required">*</span></label>
+                <select id="quote_type" required>
+                    <option value="">Select quote type...</option>
+                    <option value="replacement">Direct Replacement</option>
+                    <option value="upgrade">Upgrade/Modification</option>
+                    <option value="new_application">New Application</option>
+                    <option value="spare_parts">Spare Parts Only</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Quantity <span class="required">*</span></label>
+                <input type="number" id="quote_quantity" min="1" value="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Required Delivery Date</label>
+                <input type="date" id="quote_delivery">
+            </div>
+            
+            <div class="form-group">
+                <label>Additional Specifications</label>
+                <textarea id="quote_specs" placeholder="Please provide any additional specifications or requirements..."></textarea>
+            </div>
+            
+            <button class="submit-btn" onclick="submitForm('quote')">Submit Quote Request</button>
+        </div>
+        
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✓</div>
+            <h2>Request Submitted Successfully!</h2>
+            <p style="margin: 20px 0; color: #6c757d;">Your request has been sent to the appropriate team.</p>
+            <div class="data-output" id="dataOutput"></div>
+            <button class="submit-btn" style="margin-top: 20px;" onclick="resetApp()">Submit Another Request</button>
+        </div>
+    </div>
+    
+    <script>
+        // Get valve ID from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const valveId = urlParams.get('u') || urlParams.get('valve') || 'AWC-2024-78432';
+        
+        // In production, this would fetch from your API
+        // For demo, using different data based on valve ID
+        const valveDatabase = {
+            '234013': {
+                serialNumber: 'AWC-2024-234013',
+                model: 'PVRV-4500',
+                size: '4"',
+                lastService: '10/22/2024',
+                customer: 'TechCorp Solutions',
+                location: 'Storage Tank B-7',
+                pressure: '10 PSIG',
+                temperature: '250°F',
+                material: 'Carbon Steel',
+                testReportUrl: 'https://awc.com/reports/AWC-2024-234013.pdf'
+            },
+            'AWC-2024-78432': {
+                serialNumber: 'AWC-2024-78432',
+                model: 'OPP-4500-SS',
+                size: '4"',
+                lastService: '03/15/2024',
+                customer: 'Acme Industries',
+                location: 'Tank Farm - Unit 3',
+                pressure: '150 PSI',
+                temperature: '350°F',
+                material: 'Stainless Steel 316',
+                testReportUrl: 'https://awc.com/reports/AWC-2024-78432.pdf'
+            }
+        };
+        
+        const valveData = valveDatabase[valveId] || valveDatabase['AWC-2024-78432'];
+        
+        function showForm(formType) {
+            document.getElementById('serviceOptions').style.display = 'none';
+            document.getElementById('valveInfo').style.display = 'none';
+            
+            if (formType === 'repair') {
+                document.getElementById('repairForm').style.display = 'block';
+            } else if (formType === 'asset') {
+                document.getElementById('assetForm').style.display = 'block';
+            } else if (formType === 'quote') {
+                document.getElementById('quoteForm').style.display = 'block';
+            }
+        }
+        
+        function backToOptions() {
+            document.getElementById('repairForm').style.display = 'none';
+            document.getElementById('assetForm').style.display = 'none';
+            document.getElementById('quoteForm').style.display = 'none';
+            document.getElementById('serviceOptions').style.display = 'block';
+            document.getElementById('valveInfo').style.display = 'block';
+        }
+        
+        function submitForm(formType) {
+            let formData = {};
+            
+            // Add valve data from QR code
+            formData.valveData = valveData;
+            formData.timestamp = new Date().toISOString();
+            formData.formType = formType;
+            
+            if (formType === 'repair') {
+                formData.contact = document.getElementById('repair_contact').value;
+                formData.email = document.getElementById('repair_email').value;
+                formData.phone = document.getElementById('repair_phone').value;
+                formData.serviceType = document.getElementById('repair_type').value;
+                formData.description = document.getElementById('repair_description').value;
+                formData.preferredDate = document.getElementById('repair_date').value;
+                formData.routeTo = 'Service Coordinators';
+            } else if (formType === 'asset') {
+                formData.contact = document.getElementById('asset_contact').value;
+                formData.email = document.getElementById('asset_email').value;
+                formData.requestType = document.getElementById('asset_type').value;
+                formData.additionalValves = document.getElementById('asset_valves').value;
+                formData.requirements = document.getElementById('asset_requirements').value;
+                formData.routeTo = 'Asset Management Team';
+            } else if (formType === 'quote') {
+                formData.contact = document.getElementById('quote_contact').value;
+                formData.email = document.getElementById('quote_email').value;
+                formData.company = document.getElementById('quote_company').value;
+                formData.quoteType = document.getElementById('quote_type').value;
+                formData.quantity = document.getElementById('quote_quantity').value;
+                formData.deliveryDate = document.getElementById('quote_delivery').value;
+                formData.specifications = document.getElementById('quote_specs').value;
+                formData.routeTo = 'Inside Sales Team';
+            }
+            
+            // Show loading state
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('dataOutput').innerHTML = '<div style="text-align: center;">Sending...</div>';
+            
+            // REPLACE THIS URL WITH YOUR WEB APP URL AFTER DEPLOYMENT
+            const webAppUrl = 'https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec';
+            
+            // Send to Google Sheets via Web App
+            fetch(webAppUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Important for Google Apps Script
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                // Show success (no-cors means we can't read response)
+                document.getElementById('dataOutput').innerHTML = `
+                    <strong>✓ Request submitted successfully!</strong><br><br>
+                    <strong>Data sent to ${formData.routeTo}:</strong><br><br>
+                    ${JSON.stringify(formData, null, 2)}
+                `;
+            })
+            .catch(error => {
+                // Show error
+                document.getElementById('dataOutput').innerHTML = `
+                    <strong>Error submitting request.</strong><br>
+                    Please try again or contact support.<br><br>
+                    ${error.message}
+                `;
+            });
+            
+            // Hide forms
+            document.getElementById('repairForm').style.display = 'none';
+            document.getElementById('assetForm').style.display = 'none';
+            document.getElementById('quoteForm').style.display = 'none';
+            document.getElementById('valveInfo').style.display = 'none';
+        }
+        
+        function resetApp() {
+            // Clear all form fields
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                if (input.type === 'number') {
+                    input.value = '1';
+                } else {
+                    input.value = '';
+                }
+            });
+            
+            // Display valve information dynamically
+            const valveInfoHTML = `
+                <h3 style="margin-bottom: 15px; color: #B91C1C;">Valve Information</h3>
+                <div class="valve-detail">
+                    <label>Serial Number:</label>
+                    <span>${valveData.serialNumber}</span>
+                </div>
+                <div class="valve-detail">
+                    <label>Model:</label>
+                    <span>${valveData.model}</span>
+                </div>
+                <div class="valve-detail">
+                    <label>Size:</label>
+                    <span>${valveData.size}</span>
+                </div>
+                <div class="valve-detail">
+                    <label>Last Service:</label>
+                    <span>${valveData.lastService}</span>
+                </div>
+                <div class="valve-detail">
+                    <label>Customer:</label>
+                    <span>${valveData.customer}</span>
+                </div>
+                <div class="valve-detail">
+                    <label>Location:</label>
+                    <span>${valveData.location}</span>
+                </div>
+            `;
+            document.getElementById('valveInfo').innerHTML = valveInfoHTML;
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('serviceOptions').style.display = 'block';
+            document.getElementById('valveInfo').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
