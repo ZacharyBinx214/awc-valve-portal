@@ -334,7 +334,17 @@
                 <span>Capture QR Code</span>
             </button>
             
-            <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <p style="color: #495057; font-weight: 600; margin-bottom: 10px;">Manual Entry</p>
+                <input type="text" id="manualValveId" placeholder="Enter valve ID (e.g., 234013)" 
+                       style="width: 100%; padding: 10px; border: 1px solid #dadce0; border-radius: 6px; margin-bottom: 10px;">
+                <button onclick="loadManualValve()" 
+                        style="width: 100%; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Load Valve Data
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
                 <p style="color: #6c757d; font-size: 14px; margin: 0;">
                     For testing, you can also <a href="#" onclick="loadTestData(); return false;">load sample valve data</a>
                 </p>
