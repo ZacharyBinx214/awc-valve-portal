@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AWC Valve Service Portal</title>
+    <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -217,7 +218,85 @@
             overflow-y: auto;
         }
         
-        @media (max-width: 480px) {
+        .qr-scanner-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+        
+        .qr-scanner-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+        }
+        
+        #qr-reader {
+            width: 100%;
+        }
+        
+        .close-scanner {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .scan-btn {
+            width: 100%;
+            padding: 20px;
+            margin: 20px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .scan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .scan-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .initial-screen {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .initial-screen h2 {
+            color: #212529;
+            margin-bottom: 10px;
+        }
+        
+        .initial-screen p {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
             body {
                 padding: 0;
             }
@@ -236,37 +315,39 @@
             <div style="font-size: 14px; margin-top: 5px;">Valve Service Portal</div>
         </div>
         
-        <!-- Valve Information Display -->
-        <div class="valve-info" id="valveInfo">
-            <h3 style="margin-bottom: 15px; color: #B91C1C;">Valve Information</h3>
-            <div class="valve-detail">
-                <label>Serial Number:</label>
-                <span>AWC-2024-78432</span>
-            </div>
-            <div class="valve-detail">
-                <label>Model:</label>
-                <span>OPP-4500-SS</span>
-            </div>
-            <div class="valve-detail">
-                <label>Size:</label>
-                <span>4"</span>
-            </div>
-            <div class="valve-detail">
-                <label>Last Service:</label>
-                <span>03/15/2024</span>
-            </div>
-            <div class="valve-detail">
-                <label>Customer:</label>
-                <span>Acme Industries</span>
-            </div>
-            <div class="valve-detail">
-                <label>Location:</label>
-                <span>Tank Farm - Unit 3</span>
+        
+        <!-- QR Scanner Overlay -->
+        <div class="qr-scanner-container" id="qrScannerContainer">
+            <div class="qr-scanner-box">
+                <h3 style="text-align: center; margin-bottom: 20px;">Scan QR Code</h3>
+                <div id="qr-reader"></div>
+                <button class="close-scanner" onclick="stopScanner()">Cancel Scan</button>
             </div>
         </div>
         
+        <!-- Initial Screen (shows before scanning) -->
+        <div class="initial-screen" id="initialScreen">
+            <h2>AWC Valve Service Portal</h2>
+            <p>Scan your valve's QR code to begin</p>
+            <button class="scan-btn" onclick="startScanner()">
+                <span class="scan-icon">📷</span>
+                <span>Capture QR Code</span>
+            </button>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <p style="color: #6c757d; font-size: 14px; margin: 0;">
+                    For testing, you can also <a href="#" onclick="loadTestData(); return false;">load sample valve data</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Valve Information Display -->
+        <div class="valve-info" id="valveInfo" style="display: none;">
+            <!-- Valve details will be populated here -->
+        </div>
+        
         <!-- Service Options -->
-        <div class="service-options" id="serviceOptions">
+        <div class="service-options" id="serviceOptions" style="display: none;">
             <h2 class="service-title">How can we help you today?</h2>
             
             <button class="service-btn repair" onclick="showForm('repair')">
@@ -523,7 +604,7 @@
             document.getElementById('dataOutput').innerHTML = '<div style="text-align: center;">Sending...</div>';
             
             // REPLACE THIS URL WITH YOUR WEB APP URL AFTER DEPLOYMENT
-            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxidaLwfkg92h9qj5Z3gSFV9HcjqXVT67I04kF5RlhtHYc5yxnzvK0xVrO1VDDkfewU/exec';
+            const webAppUrl = 'https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec';
             
             // Send to Google Sheets via Web App
             fetch(webAppUrl, {
